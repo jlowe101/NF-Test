@@ -1,0 +1,511 @@
+
+<html class="dark" lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Netflix Cookie Checker · Premium Slate</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;family=JetBrains+Mono&amp;display=swap"
+        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/3.5.0/css/flag-icon.min.css">
+    <script> tailwind.config = { darkMode: "class", theme: { extend: { colors: { primary: "#38BDF8", secondary: "#0EA5E9", "background-light": "#F8FAFC", "background-dark": "#0F172A", "surface-dark": "#1E293B", "border-dark": "#334155", }, fontFamily: { sans: ["Inter", "sans-serif"], display: ["Inter", "sans-serif"], mono: ["JetBrains Mono", "monospace"], }, borderRadius: { DEFAULT: "0.75rem", }, }, }, }; </script>
+    <style>
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(56, 189, 248, 0.15);
+            box-shadow: 0 20px 35px -8px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(56, 189, 248, 0.1) inset;
+            transition: border-color 0.2s ease, box-shadow 0.3s ease;
+        }
+
+        .glass-panel:hover {
+            border-color: rgba(56, 189, 248, 0.3);
+            box-shadow: 0 20px 40px -8px rgba(56, 189, 248, 0.2);
+        }
+
+        .glow-primary {
+            box-shadow: 0 0 30px rgba(56, 189, 248, 0.2);
+        }
+
+        .primary-gradient {
+            background: linear-gradient(135deg, #38BDF8 0%, #0EA5E9 100%);
+            background-size: 200% 200%;
+            transition: all 0.4s ease;
+        }
+
+        .primary-gradient:hover {
+            background-position: 100% 0;
+            transform: translateY(-2px);
+            box-shadow: 0 20px 30px -10px #38BDF8;
+        }
+
+        #pills-tab button {
+            position: relative;
+            overflow: hidden;
+        }
+
+        #pills-tab button.active-tab {
+            background: #38BDF8 !important;
+            color: #0F172A !important;
+            font-weight: 700;
+            box-shadow: 0 8px 18px -6px #38BDF8, 0 0 0 1px #ffffff20 inset;
+        }
+
+        #pills-tab button:not(.active-tab):hover {
+            background: rgba(56, 189, 248, 0.15);
+            color: #fff;
+        }
+
+        .pulse-slate {
+            animation: pulseGlow 2s infinite;
+        }
+
+        @keyframes pulseGlow {
+            0% {
+                opacity: 0.6;
+                filter: blur(4px);
+            }
+
+            50% {
+                opacity: 1;
+                filter: blur(8px);
+            }
+
+            100% {
+                opacity: 0.6;
+                filter: blur(4px);
+            }
+        }
+
+        .brand h4 a::after {
+            content: '';
+            position: absolute;
+            top: -2px;
+            right: -8px;
+            width: 8px;
+            height: 8px;
+            background: #38BDF8;
+            border-radius: 50%;
+            opacity: 0.6;
+            filter: blur(2px);
+        }
+
+        .brand h4 a {
+            position: relative;
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #1E293B;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #38BDF8;
+            border-radius: 20px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #7ad0ff;
+        }
+
+        .live-entry {
+            transition: 0.15s;
+            border-left: 3px solid transparent;
+        }
+
+        .live-entry:hover {
+            border-left-color: #38BDF8;
+            background: rgba(56, 189, 248, 0.05);
+        }
+
+        body {
+            padding-top: 70px;
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding-top: 60px;
+            }
+        }
+
+        header {
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(16px) saturate(180%);
+            border-bottom: 1px solid rgba(56, 189, 248, 0.2);
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(8px);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background: rgba(15, 23, 42, 0.95);
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            border-radius: 1.5rem;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(56, 189, 248, 0.2) inset;
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: scale(1);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: rgba(56, 189, 248, 0.1);
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 9999px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #38BDF8;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .modal-close:hover {
+            background: rgba(56, 189, 248, 0.2);
+            transform: scale(1.1);
+        }
+    </style>
+</head>
+
+<body
+    class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen flex flex-col transition-colors duration-300">
+    <header
+        class="fixed top-0 left-0 w-full z-50 px-4 py-3 flex flex-wrap items-center justify-between border-b border-primary/20"
+        style="z-index: 1050; background: rgba(15,23,42,0.8); backdrop-filter: blur(16px);">
+        <div class="brand">
+            <h4 class="font-bold mb-0 text-white" style="letter-spacing: 1px; font-size: 1.2rem;"><a href="#"
+                    class="text-white no-underline flex items-center gap-2"><i
+                        class="fas fa-cookie-bite text-primary"></i><span class="inline sm:inline">Limon
+                        Crunch</span><span class="hidden">LC</span></a></h4>
+        </div>
+        <div class="flex"><a href="/guide.htm"
+                class="inline-flex items-center gap-1 sm:gap-2 py-2 px-2 sm:px-3 shadow-sm font-bold text-white text-xs sm:text-sm rounded-lg transition-all whitespace-nowrap"
+                style="background: linear-gradient(135deg, #38BDF8, #0EA5E9); cursor: pointer;"><span
+                    class="material-icons-round text-base" style="color: wheat;">help_outline</span><span
+                    class="nav-btn-text inline sm:inline">How To Use</span></a></div>
+    </header>
+    <main class="flex-grow flex flex-col items-center justify-center px-6 py-12 relative overflow-hidden">
+        <div
+            class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/5 rounded-full blur-[120px] pointer-events-none animate-pulse">
+        </div>
+        <div class="absolute top-20 right-20 w-72 h-72 bg-primary/5 rounded-full blur-[90px] animate-pulse"
+            style="animation-delay:1s;"></div>
+        <div class="absolute bottom-20 left-20 w-80 h-80 bg-secondary/5 rounded-full blur-[100px] animate-pulse"
+            style="animation-delay:2s;"></div>
+        <div class="w-full max-w-3xl z-10">
+            <div class="flex justify-center mb-8">
+                <ul class="flex flex-wrap items-center justify-center gap-1 sm:gap-2 p-1 bg-slate-200 dark:bg-surface-dark/80 border border-slate-300 dark:border-border-dark/80 rounded-xl w-full sm:w-auto backdrop-blur-sm"
+                    id="pills-tab" role="tablist">
+                    <li class="list-none flex-1 sm:flex-auto"><button onclick="showSingleTab()" id="singleTabBtn"
+                            class="flex-1 sm:flex-auto flex items-center justify-center gap-1 sm:gap-2 px-3 sm:px-8 py-2.5 rounded-lg text-sm sm:text-base font-semibold transition-all whitespace-nowrap text-white shadow-lg"><i
+                                class="fas fa-bolt"></i><span>SINGLE</span></button></li>
+                    <li class="list-none flex-1 sm:flex-auto"><button onclick="showBulkTab()" id="bulkTabBtn"
+                            class="w-full flex items-center justify-center gap-1 sm:gap-2 px-3 sm:px-8 py-2.5 rounded-lg text-sm sm:text-base font-medium transition-all whitespace-nowrap text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"><i
+                                class="fas fa-layer-group"></i><span>BULK</span></button></li>
+                    <li class="list-none flex-1 sm:flex-auto"><button onclick="showCookiesTab()" id="cookiesTabBtn"
+                            class="w-full flex items-center justify-center gap-1 sm:gap-2 px-3 sm:px-8 py-2.5 rounded-lg text-sm sm:text-base font-medium transition-all whitespace-nowrap text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"><i
+                                class="fas fa-download"></i><span>GENERATE</span></button></li>
+                </ul>
+            </div>
+            <div id="tabContent">
+                <div id="singleTab" class="tab-pane" style="display: block; position: relative;">
+                    <div class="glass-panel rounded-3xl p-6 md:p-10 glow-primary relative mb-4"
+                        style="position: relative; overflow: hidden;">
+                        <div
+                            class="absolute top-0 left-1/4 w-32 h-0.5 bg-gradient-to-r from-transparent via-primary to-transparent">
+                        </div>
+                        <form id="singleCheckForm" onsubmit="handleSingleCheckWithLoading(event)"><label
+                                class="block mb-4 text-xs font-bold tracking-widest text-slate-500 dark:text-slate-400 uppercase"><i
+                                    class="fas fa-paste mr-2 text-primary"></i>Paste Your Cookie (Raw, Netscape, JSON)
+                            </label>
+                            <div class="relative group"><textarea id="singleCookieInput"
+                                    class="w-full h-48 bg-white dark:bg-background-dark/70 border-2 border-slate-200 dark:border-border-dark rounded-2xl p-5 text-slate-900 dark:text-slate-200 font-mono text-sm focus:ring-2 focus:ring-primary focus:border-transparent transition-all outline-none resize-none placeholder:text-slate-400 dark:placeholder:text-slate-600"
+                                    placeholder="Paste your cookie here (Raw, Netscape, or JSON)..."
+                                    required=""></textarea>
+                                <div class="absolute bottom-4 left-4 flex items-center justify-center w-8 h-8 bg-primary/20 backdrop-blur-sm rounded-full border border-primary/30 text-primary cursor-pointer hover:bg-primary/30 hover:scale-110 transition-all opacity-30 group-focus-within:opacity-100"
+                                    onclick="handlePasteClick(event, this)" ontouchstart="handlePasteTouch(event, this)"
+                                    title="Paste from clipboard (appends to existing)"><i
+                                        class="fas fa-paste text-sm"></i></div>
+                                <div
+                                    class="absolute bottom-4 right-4 text-slate-400 flex items-center gap-1.5 pointer-events-none opacity-0 group-focus-within:opacity-100 transition-opacity">
+                                    <span class="text-[10px] font-bold uppercase tracking-widest">Auto-detecting
+                                        format</span>
+                                    <div class="w-1.5 h-1.5 bg-primary rounded-full animate-pulse"></div>
+                                </div>
+                            </div><button type="submit" id="singleCheckBtn"
+                                class="w-full mt-6 py-4 rounded-2xl primary-gradient text-white font-bold text-lg tracking-wide shadow-xl shadow-primary/20 hover:shadow-primary/40 hover:-translate-y-0.5 transition-all flex items-center justify-center gap-3"><i
+                                    class="fas fa-bolt"></i> START SINGLE CHECK </button>
+                        </form>
+                        <div id="singleLoadingOverlay"
+                            class="absolute inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center rounded-3xl"
+                            style="display: none;">
+                            <div
+                                class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl p-8 max-w-xs w-full border border-primary/30 shadow-2xl shadow-primary/20">
+                                <div class="flex flex-col items-center">
+                                    <div class="relative mb-6">
+                                        <div
+                                            class="absolute inset-0 rounded-full border-2 border-primary/20 animate-ping">
+                                        </div>
+                                        <div class="absolute inset-2 rounded-full border-2 border-primary/40 animate-spin"
+                                            style="animation-duration: 3s;"></div>
+                                        <div
+                                            class="w-20 h-20 rounded-full border-4 border-slate-600 border-t-primary border-r-primary/50 border-b-primary/30 border-l-primary/10 animate-spin">
+                                        </div>
+                                        <div class="absolute inset-0 flex items-center justify-center"><i
+                                                class="fas fa-bolt text-primary text-2xl"></i></div>
+                                    </div>
+                                    <h4 class="text-xl font-bold text-white mb-2">Generating Token</h4>
+                                    <div class="flex gap-2 mt-2">
+                                        <div class="w-2 h-2 bg-primary rounded-full animate-bounce"
+                                            style="animation-delay: 0s"></div>
+                                        <div class="w-2 h-2 bg-primary rounded-full animate-bounce"
+                                            style="animation-delay: 0.2s"></div>
+                                        <div class="w-2 h-2 bg-primary rounded-full animate-bounce"
+                                            style="animation-delay: 0.4s"></div>
+                                    </div>
+                                    <div class="absolute -inset-1 bg-primary/5 blur-xl rounded-full -z-10"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="singleResultArea" class="mt-4" style="display: none;"></div>
+                </div>
+                <div id="bulkTab" class="tab-pane" style="display: none; position: relative;">
+                    <div class="glass-panel rounded-3xl p-6 md:p-10 glow-primary relative mb-4"
+                        style="position: relative; overflow: hidden;">
+                        <form id="bulkCheckForm" onsubmit="handleBulkCheckWithLoading(event)"><label
+                                class="block mb-4 text-xs font-bold tracking-widest text-slate-500 dark:text-slate-400 uppercase"><i
+                                    class="fas fa-layer-group mr-2 text-primary"></i>Paste Multiple Cookies </label>
+                            <div class="relative group"><textarea id="bulkCookieInput"
+                                    class="w-full h-48 bg-white dark:bg-background-dark/70 border-2 border-slate-200 dark:border-border-dark rounded-2xl p-5 text-slate-900 dark:text-slate-200 font-mono text-sm focus:ring-2 focus:ring-primary focus:border-transparent transition-all outline-none resize-none placeholder:text-slate-400 dark:placeholder:text-slate-600"
+                                    placeholder="Paste your cookies here (one per line or | separator)..."
+                                    required=""></textarea>
+                                <div class="absolute bottom-4 left-4 flex items-center justify-center w-8 h-8 bg-primary/20 backdrop-blur-sm rounded-full border border-primary/30 text-primary cursor-pointer hover:bg-primary/30 hover:scale-110 transition-all opacity-30 group-focus-within:opacity-100"
+                                    onclick="handlePasteClick(event, this)" ontouchstart="handlePasteTouch(event, this)"
+                                    title="Paste from clipboard (appends to existing)"><i
+                                        class="fas fa-paste text-sm"></i></div>
+                                <div
+                                    class="absolute bottom-4 right-4 text-slate-400 flex items-center gap-1.5 pointer-events-none opacity-0 group-focus-within:opacity-100 transition-opacity">
+                                    <span class="text-[10px] font-bold uppercase tracking-widest">Bulk mode
+                                        enabled</span>
+                                    <div class="w-1.5 h-1.5 bg-primary rounded-full animate-pulse"></div>
+                                </div>
+                            </div><button type="submit" id="bulkCheckBtn"
+                                class="w-full mt-6 py-4 rounded-2xl primary-gradient text-white font-bold text-lg tracking-wide shadow-xl shadow-primary/20 hover:shadow-primary/40 hover:-translate-y-0.5 transition-all flex items-center justify-center gap-3"><i
+                                    class="fas fa-play"></i> START BULK CHECK </button>
+                        </form>
+                        <div id="bulkLoadingOverlay"
+                            class="absolute inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center rounded-3xl"
+                            style="display: none;">
+                            <div
+                                class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl p-8 max-w-xs w-full border border-primary/30 shadow-2xl shadow-primary/20">
+                                <div class="flex flex-col items-center">
+                                    <div class="relative mb-6">
+                                        <div
+                                            class="absolute inset-0 rounded-full border-2 border-primary/20 animate-ping">
+                                        </div>
+                                        <div class="absolute inset-2 rounded-full border-2 border-primary/40 animate-spin"
+                                            style="animation-duration: 3s;"></div>
+                                        <div
+                                            class="w-20 h-20 rounded-full border-4 border-slate-600 border-t-primary border-r-primary/50 border-b-primary/30 border-l-primary/10 animate-spin">
+                                        </div>
+                                        <div class="absolute inset-0 flex items-center justify-center"><i
+                                                class="fas fa-layer-group text-primary text-2xl"></i></div>
+                                    </div>
+                                    <h4 class="text-xl font-bold text-white mb-2">Processing Bulk Cookies</h4>
+                                    <div class="flex gap-2 mt-2">
+                                        <div class="w-2 h-2 bg-primary rounded-full animate-bounce"
+                                            style="animation-delay: 0s"></div>
+                                        <div class="w-2 h-2 bg-primary rounded-full animate-bounce"
+                                            style="animation-delay: 0.2s"></div>
+                                        <div class="w-2 h-2 bg-primary rounded-full animate-bounce"
+                                            style="animation-delay: 0.4s"></div>
+                                    </div>
+                                    <div class="absolute -inset-1 bg-primary/5 blur-xl rounded-full -z-10"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="liveSection" style="display: none;" class="mt-4">
+                        <div class="glass-panel rounded-2xl p-4 border border-primary/20">
+                            <div class="flex justify-between items-center border-b border-border-dark/80 pb-2 mb-3">
+                                <h6 class="text-primary font-bold text-sm uppercase tracking-wider"><i
+                                        class="fas fa-check-circle mr-2"></i> Live Accounts </h6>
+                                        <button
+                                    id="topDownloadBtn" onclick="downloadResults()"
+                                    class="text-xs bg-primary/20 text-primary px-3 py-1 rounded-lg hover:bg-primary/30 transition-all hidden"><i
+                                        class="fas fa-download mr-1"></i> Save .txt </button>
+                            </div>
+                            <div id="liveList" class="space-y-4 max-h-80 overflow-auto pr-1" style="max-height: 40rem">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="cookiesTab" class="tab-pane" style="display: none;">
+                    <div id="unlockSection"
+                        class="glass-panel rounded-3xl p-6 md:p-10 glow-primary relative border border-primary/20">
+                        <h5 class="text-xl font-bold mb-6 text-white flex items-center justify-center gap-2"><i
+                                class="fas fa-wand-magic-sparkles text-primary"></i> Generate Cookies </h5>
+                        <div class="mb-6"><label
+                                class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 text-center">Enter
+                                Coupon Code</label><input type="text" id="couponCode"
+                                class="w-full bg-background-dark/70 border-2 border-border-dark rounded-xl p-4 text-white text-center text-xl tracking-widest focus:ring-2 focus:ring-primary focus:border-transparent transition-all outline-none"
+                                placeholder="Enter Coupon"></div><button onclick="unlockVIP(event)"
+                            class="w-full py-4 bg-primary text-slate-900 font-bold rounded-xl hover:brightness-110 transition-all text-lg flex items-center justify-center gap-2 shadow-xl"><i
+                                class="fas fa-unlock-alt"></i> UNLOCK </button>
+                        <div id="unlockError" class="mt-4 text-center text-sm text-red-400 hidden"><i
+                                class="fas fa-times-circle mr-1"></i> Invalid coupon code </div>
+                        <p class="mt-6 text-center text-slate-400 text-xs"> Don't have a coupon? <a
+                                href="https://discord.gg/BNzSDcpaQ" target="_blank"
+                                class="text-primary hover:underline"> Join Discord <i
+                                    class="fab fa-discord ml-1"></i></a></p>
+                    </div>
+                    <div id="vipSuccessSection"
+                        class="glass-panel rounded-3xl p-6 md:p-10 glow-primary relative border border-primary/20 hidden">
+                        <div id="vipLoadingOverlay"
+                            class="absolute inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center rounded-3xl"
+                            style="display: none;">
+                            <div
+                                class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl p-8 max-w-xs w-full border border-primary/30 shadow-2xl shadow-primary/20">
+                                <div class="flex flex-col items-center">
+                                    <div class="relative mb-6">
+                                        <div
+                                            class="absolute inset-0 rounded-full border-2 border-primary/20 animate-ping">
+                                        </div>
+                                        <div class="absolute inset-2 rounded-full border-2 border-primary/40 animate-spin"
+                                            style="animation-duration: 3s;"></div>
+                                        <div
+                                            class="w-20 h-20 rounded-full border-4 border-slate-600 border-t-primary border-r-primary/50 border-b-primary/30 border-l-primary/10 animate-spin">
+                                        </div>
+                                        <div class="absolute inset-0 flex items-center justify-center"><i
+                                                class="fas fa-crown text-primary text-2xl"></i></div>
+                                    </div>
+                                    <h4 class="text-xl font-bold text-white mb-2">Claiming VIP Cookies</h4>
+                                    <p class="text-slate-400 text-sm text-center mb-4">Please wait while we process your
+                                        request...</p>
+                                    <div class="flex gap-2 mt-2">
+                                        <div class="w-2 h-2 bg-primary rounded-full animate-bounce"
+                                            style="animation-delay: 0s"></div>
+                                        <div class="w-2 h-2 bg-primary rounded-full animate-bounce"
+                                            style="animation-delay: 0.2s"></div>
+                                        <div class="w-2 h-2 bg-primary rounded-full animate-bounce"
+                                            style="animation-delay: 0.4s"></div>
+                                    </div>
+                                    <div class="absolute -inset-1 bg-primary/5 blur-xl rounded-full -z-10"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-center"><i class="fas fa-crown text-5xl text-primary mb-4"></i>
+                            <h5 class="text-2xl font-bold mb-2 text-white">VIP Access Granted!</h5>
+                            <p class="text-slate-400 mb-6">You now have access to exclusive VIP cookies.</p><button
+                                id="claimVipBTN" onclick="handleClaimVIPWithLoading(event)"
+                                class="w-full py-4 bg-primary text-slate-900 font-bold rounded-xl hover:brightness-110 transition-all text-lg flex items-center justify-center gap-2"><i
+                                    class="fas fa-gift"></i> CLAIM VIP COOKIES </button>
+                        </div><br>
+                        <div id="vipClaimError" class="mb-4 text-center text-sm text-red-400 hidden"><i
+                                class="fas fa-exclamation-circle mr-1"></i><span id="vipClaimErrorMessage"></span></div>
+                    </div>
+                    <div id="savedCookiesSection" class="mt-4 hidden">
+                        <h6
+                            class="text-primary font-bold mb-4 pb-2 border-b border-border-dark flex items-center gap-2">
+                            <i class="fas fa-cookie"></i> YOUR VIP COOKIES </h6>
+                        <div id="savedCookiesList" class="space-y-4"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <div id="mobileModal" class="modal-overlay" onclick="closeMobileModal(event)">
+        <div class="modal-content relative" onclick="event.stopPropagation()"><button class="modal-close"
+                onclick="closeMobileModal(event)"><i class="fas fa-times"></i></button>
+            <div class="text-center mb-6">
+                <div class="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-4"><i
+                        class="fas fa-mobile-alt text-3xl text-primary"></i></div>
+                <h3 class="text-2xl font-bold text-white mb-2">Mobile Watch Guide</h3>
+                <div class="w-12 h-1 bg-primary rounded-full mx-auto"></div>
+            </div>
+            <div class="space-y-4 text-slate-300">
+                <div class="bg-slate-800/50 border border-primary/20 rounded-xl p-3 my-2"><code
+                        class="text-primary text-sm font-mono break-all"
+                        id="tokenMo">https://netflix.com/unsupported</code></div>
+                <div class="flex items-start gap-3">
+                    <div
+                        class="w-6 h-6 bg-primary/20 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <span class="text-primary text-xs font-bold">1</span></div>
+                    <p class="text-sm">Manually copy the <span class="text-primary font-semibold">Highlighted
+                            Link</span> from this modal or press <span class="text-primary font-semibold">Copy</span>
+                    </p>
+                </div>
+                <div class="flex items-start gap-3">
+                    <div
+                        class="w-6 h-6 bg-primary/20 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <span class="text-primary text-xs font-bold">2</span></div>
+                    <p class="text-sm">Paste it in your <span class="text-primary font-semibold">Android browser</span>
+                        and enter</p>
+                </div>
+                <div class="flex items-start gap-3">
+                    <div
+                        class="w-6 h-6 bg-primary/20 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <span class="text-primary text-xs font-bold">3</span></div>
+                    <p class="text-sm">You will be redirected directly to <span
+                            class="text-primary font-semibold">https://netflix.com/unsupported</span></p>
+                </div>
+                <div class="flex items-start gap-3">
+                    <div
+                        class="w-6 h-6 bg-primary/20 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <span class="text-primary text-xs font-bold">4</span></div>
+                    <p class="text-sm">It will suggest to open the app - click that and it will direct you to the <span
+                            class="text-primary font-semibold">mobile app smoothly</span></p>
+                </div>
+            </div>
+            <div class="mt-8 flex gap-3"><button onclick="copyMobileInstructions(this)"
+                    class="flex-1 py-3 bg-primary/10 border border-primary/30 text-primary rounded-xl text-sm font-bold hover:bg-primary/20 transition-all flex items-center justify-center gap-2"><i
+                        class="fas fa-copy"></i> Copy Link </button><button onclick="closeMobileModal(event)"
+                    class="flex-1 py-3 primary-gradient text-white rounded-xl text-sm font-bold hover:scale-[1.02] transition-all flex items-center justify-center gap-2"><i
+                        class="fas fa-check"></i> Got It </button></div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+    <div
+        style="position:fixed; top:0; left:-10%; width:10%; height:100%; background:linear-gradient(90deg, transparent, rgba(56,189,248,0.05), transparent); transform:skewX(-15deg); pointer-events:none;">
+    </div>
+</body>
+
+</html>
